@@ -1,0 +1,21 @@
+_________________________________________________
+CONTAINMENT TREE
+
+Editor
+	LineNumBar
+	SearchBar
+	MenuBar
+	InputArea
+		screen : ViewPanel
+
+		Text : array[ CharData ]
+			CharData 
+				char
+				FoldState : { START, NONE, END }
+				FoldLevel : integer 
+
+		Cursor : Position
+			TextIndex : integer
+			ScreenLineIndex : integer
+			ScreenColumnIndex : integer
+
