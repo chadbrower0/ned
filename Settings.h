@@ -200,7 +200,7 @@ Settings
             css.mIndent = "    ";
             mFileTypes.push_back( css );
 
-            FileTypeInfo js ( "js", "html", "ejs" );
+            FileTypeInfo js ( "js", "html", "ejs", "jsx" );
             js.mComment = "// ";
             js.mIndent = "    ";
             mFileTypes.push_back( js );
