@@ -32,7 +32,7 @@ all:  main.cpp  *.h  Shared/*.h
 	g++ $(CXXFLAGS_FAST)  main.cpp  -o main.fast.exe  $(INCLUDE_PATH) $(LIBRARY_PATH)
 	rm -f ned
 	cp main.debug.exe ned
-	@echo 'Add to path:  PATH=$$PATH:'`pwd`'/ned'
+	@echo 'Add to path:  PATH=$$PATH:'`pwd`
 
 help:  
 	@echo 
