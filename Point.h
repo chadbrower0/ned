@@ -59,6 +59,7 @@ Point
 			{
 			Y = model.Y;
 			X = model.X;
+			return *this;
 			}
 
 	};

@@ -66,6 +66,7 @@ PanelOwner
 		operator= ( PANEL* panel ) // takes ownership of panel
 			{
 			Set( panel );
+			return *this;
 			}
 
 	};

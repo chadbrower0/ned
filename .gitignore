@@ -1,4 +1,5 @@
 ned
 *.exe
 *.exe.dSYM
+*.log
 

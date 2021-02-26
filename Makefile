@@ -31,11 +31,8 @@ all:  main.cpp  *.h  Shared/*.h
 	g++ $(CXXFLAGS_DEBUG)  main.cpp  -o main.debug.exe  $(INCLUDE_PATH) $(LIBRARY_PATH)
 	g++ $(CXXFLAGS_FAST)  main.cpp  -o main.fast.exe  $(INCLUDE_PATH) $(LIBRARY_PATH)
 	rm -f ned
-	ln -s main.fast.exe ned
-	@echo 
-	@echo "I recommend that you put this alias command in your bash config file:"
-	@echo "    alias ned=`pwd`/main.fast.exe "
-	@echo 
+	cp main.debug.exe ned
+	@echo 'Add to path:  PATH=$$PATH:'`pwd`'/ned'
 
 help:  
 	@echo 

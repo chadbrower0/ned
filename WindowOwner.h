@@ -68,6 +68,7 @@ WindowOwner
 		operator= ( WINDOW* window ) // takes ownership of window
 			{
 			Set( window );
+			return *this;
 			}
 
 	};
