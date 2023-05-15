@@ -211,6 +211,7 @@ Settings
             mFileTypes.push_back( pig );
 
 
+            AddFunctionKey( BACKSPACE, 127 );
             AddFunctionKey( BACKSPACE, 263 );
             AddFunctionKey( BACKSPACE, 8, "CTRL+h" );
             AddFunctionKey( BACKWARD, 260 );
