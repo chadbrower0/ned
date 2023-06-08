@@ -257,6 +257,13 @@ MenuBar
     ////////// methods
 
             public: void
+        ResizeWindow( ){
+            RepaintBar();
+            update_panels();
+            doupdate();
+        }
+
+            public: void
         CreatePanel( )
             {
             // find screen size
@@ -438,7 +445,7 @@ MenuBar
                 else                                     
                     ActivateSubmenuItem( menu_node, menu_node.mCurrentItem, true, true, menu_path, menu_path_set );
                 }
-            else if ( Settings::Get().KeyHasFunction( i, Settings::MENU ) )
+            else if ( Settings::Get().KeyHasFunction( i, Settings::MENU )  ||  (i == KEY_RESIZE) )
                 {
                 menu_path.clear();
                 menu_path_set = true;

@@ -7,6 +7,7 @@
 #include <time.h>
 #include <Shared/TextFunctions.h>
 #include <Shared/String.h>
+#include "KeyListener.h"
 #include "MenuBar.h"
 #include "MessageBar.h"
 #include "LineNumBar.h"
@@ -29,7 +30,7 @@
 
 
     class
-Editor
+Editor :  KeyListener
     {
     ////////// member data
         protected: std::string mFilepath;
@@ -259,7 +260,8 @@ if ( Logger::Enabled(Logger::DEBUG) ) Logger::Log( (String) "\t indent='" + mInp
 
                 // mouse event
                 if ( i == KEY_MOUSE ) HandleMouseEvent();
-else if ( i == -1 ) {  }  // ignore noise from window switching
+                else if ( i == KEY_RESIZE )  ResizeWindow();
+                else if ( i == -1 ) {  }  // ignore noise from window switching
                 // keyboard shortcut
                 else if ( Settings::Get().KeyHasFunction( i, Settings::BACKWARD ) )  mInputArea.MoveLeft();
                 else if ( Settings::Get().KeyHasFunction( i, Settings::FORWARD ) )   mInputArea.MoveRight();
@@ -301,11 +303,11 @@ else if ( i == -1 ) {  }  // ignore noise from window switching
                     }
                 else if ( Settings::Get().KeyHasFunction( i, Settings::GOTO_LINE ) )
                     {
-                    int new_line_num = mLineNumBar.Run( mInputArea.GetLineNumber() );
+                    int new_line_num = mLineNumBar.Run( mInputArea.GetLineNumber(), *this );
                     if ( new_line_num != -1 )
                         mInputArea.GoToLine( new_line_num );
                     }
-                else if ( Settings::Get().KeyHasFunction( i, Settings::SEARCH ) )        mSearchBar.Run( mInputArea );
+                else if ( Settings::Get().KeyHasFunction( i, Settings::SEARCH ) )        mSearchBar.Run( mInputArea, *this );
                 else if ( Settings::Get().KeyHasFunction( i, Settings::MATCH_PAREN ) )   mInputArea.JumpToMatchingParentheses();
                 else if ( Settings::Get().KeyHasFunction( i, Settings::NEW_CLASS ) )     mInputArea.Insert( mInputArea.mNewClassString );
                 else if ( Settings::Get().KeyHasFunction( i, Settings::NEW_MAIN ) )      mInputArea.Insert( mInputArea.mNewMainString );
@@ -470,11 +472,11 @@ mousemask( ALL_MOUSE_EVENTS, NULL );
             else if ( function == Settings::REDO )      mInputArea.Redo();
             else if ( function == Settings::GOTO_LINE )
                 {
-                int new_line_num = mLineNumBar.Run( mInputArea.GetLineNumber() );
+                int new_line_num = mLineNumBar.Run( mInputArea.GetLineNumber(), *this );
                 if ( new_line_num != -1 )
                     mInputArea.GoToLine( new_line_num );
                 }
-            else if ( function == Settings::SEARCH )        mSearchBar.Run( mInputArea );
+            else if ( function == Settings::SEARCH )        mSearchBar.Run( mInputArea, *this );
             else if ( function == Settings::MATCH_PAREN )   mInputArea.JumpToMatchingParentheses();
             else if ( function == Settings::NEW_CLASS )     mInputArea.Insert( mInputArea.mNewClassString );
             else if ( function == Settings::NEW_MAIN )      mInputArea.Insert( mInputArea.mNewMainString );
@@ -490,13 +492,28 @@ mousemask( ALL_MOUSE_EVENTS, NULL );
             }
 
 
+            private: void
+        onKey( int keyNum ){
+            if ( keyNum == KEY_RESIZE )  ResizeWindow();
+        }
+
+            private: void
+        ResizeWindow(){
+            MessageBar::CreatePanel();
+            mLineNumBar.CreatePanel( true );  // Line-number & search & input-area save state, so resize rather than recreate
+            mSearchBar.CreatePanel( true );
+            mMenuBar.ResizeWindow();  // Menu & message bars re-display while resizing
+            mInputArea.ResizeWindow();
+            MessageBar::Display( "KEY_RESIZE" );
+        }
+
             protected: void
         SaveFileAs( )
             {  PSEUDOSTACK_START
 
             FilepathBar filepath_bar;  // ( mSettings );
             filepath_bar.CreatePanel( "Save as filepath" );
-            std::string new_filepath = filepath_bar.Run( mFilepath );
+            std::string new_filepath = filepath_bar.Run( *this, mFilepath );
             if ( new_filepath != "" )
                 {
                 mFilepath = new_filepath;
@@ -517,7 +534,7 @@ mousemask( ALL_MOUSE_EVENTS, NULL );
                 {
                 FilepathBar filepath_bar;
                 filepath_bar.CreatePanel( "Save as filepath" );
-                mFilepath = filepath_bar.Run();
+                mFilepath = filepath_bar.Run( *this );
                 }
             // if file is named... save
             if ( mFilepath != "" )
@@ -546,7 +563,7 @@ mousemask( ALL_MOUSE_EVENTS, NULL );
                     // prompt for filepath
                     FilepathBar filepath_bar;  //  ( mSettings );
                     filepath_bar.CreatePanel( "Save as filepath" );
-                    std::string new_filepath = filepath_bar.Run( mFilepath );
+                    std::string new_filepath = filepath_bar.Run( *this, mFilepath );
 
                     // if filepath given... save & exit
                     if ( new_filepath != "" )

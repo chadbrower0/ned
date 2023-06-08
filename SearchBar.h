@@ -1,6 +1,7 @@
 #ifndef INCLUDED_SearchBar_h
 #define INCLUDED_SearchBar_h
 ////////////////////////////////////////////////////////////////////////////////
+#include "KeyListener.h"
 #include "WindowPanel.h"
 #include "InputLine.h"
 #include "InputArea.h"
@@ -24,7 +25,6 @@ SearchBar
         public: WindowPanel mBar;
         public: InputLine mInputFind;
         public: InputLine mInputReplace;
-//         public: const Settings& mSettings;
         public: const std::string& mCopiedText;
 
         protected: MouseMap<tAction> mMouseToAction;
@@ -33,10 +33,8 @@ SearchBar
     ////////// construction
 
             public:
-        SearchBar( // const Settings& settings, 
-                   const std::string& copied_text )
+        SearchBar( const std::string& copied_text )
             :
-//             mSettings ( settings ), 
             mCopiedText ( copied_text )
             {
             }
@@ -55,7 +53,7 @@ SearchBar
     ////////// methods
 
             public: void
-        CreatePanel( )
+        CreatePanel( bool resizeOnly=false )
             {
             // find screen size
             int y_size, x_size;
@@ -81,9 +79,14 @@ SearchBar
             Print( find_label, field_start );
             // find input
             mMouseToAction.Add(  EDIT_FIND,  field_start,  Point( field_start.Y + 1,  field_start.X + find_size ) );
-            mInputFind.CreatePanel( find_size, 
-                                    bar_start.Y + field_start.Y,  bar_start.X + field_start.X, 
-                                    A_UNDERLINE, "" );
+            if ( resizeOnly ){
+                mInputFind.ResizeWindow( find_size,  bar_start.Y + field_start.Y,  bar_start.X + field_start.X );
+                }
+            else {
+                mInputFind.CreatePanel( find_size, 
+                                        bar_start.Y + field_start.Y,  bar_start.X + field_start.X, 
+                                        A_UNDERLINE, "" );
+                }
             field_start.X += find_size;
             // replace label
             Print( "    ", field_start );
@@ -91,9 +94,14 @@ SearchBar
             Print( replace_label, field_start );
             // replace input
             mMouseToAction.Add(  EDIT_REPLACE,  field_start,  Point( field_start.Y + 1, field_start.X + replace_size ) );
-            mInputReplace.CreatePanel( replace_size, 
-                                       bar_start.Y + field_start.Y,  bar_start.X + field_start.X,
-                                       A_UNDERLINE, "" );
+            if ( resizeOnly ){
+                mInputReplace.ResizeWindow( replace_size,  bar_start.Y + field_start.Y,  bar_start.X + field_start.X );
+                }
+            else {
+                mInputReplace.CreatePanel( replace_size, 
+                                           bar_start.Y + field_start.Y,  bar_start.X + field_start.X,
+                                           A_UNDERLINE, "" );
+                }
             field_start.X += replace_size;
             // cancel label
             Print( "    ", field_start );
@@ -113,9 +121,10 @@ SearchBar
 
             public: void
         Run( InputArea& synch, // modified
-             const std::string& find_text = "" )
+             KeyListener& resizeListener )
+//             const std::string& find_text = "" )
             {
-            if ( find_text != "" ) mInputFind.SetText( find_text );
+//             if ( find_text != "" ) mInputFind.SetText( find_text );
             mInputFind.MoveLineEnd();
             mInputReplace.MoveLineEnd();
 
@@ -143,7 +152,8 @@ SearchBar
                     HandleMouseEvent( mouse_event, synch, replace, cancel );
                     if ( cancel ) return;
                     }
-else if ( i == -1 ) {  }   // noise from window switching
+                else if ( i == KEY_RESIZE ) {  Cancel();  resizeListener.onKey(i);  return;  }
+                else if ( i == -1 ) {  }   // Ignore noise from window switching
                 // replace input is active
                 else if ( replace )
                     {

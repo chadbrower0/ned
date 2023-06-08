@@ -1,6 +1,7 @@
 #ifndef INCLUDED_LineNumBar_h
 #define INCLUDED_LineNumBar_h
 ////////////////////////////////////////////////////////////////////////////////
+#include "KeyListener.h"
 #include "WindowPanel.h"
 #include "InputLine.h"
 #include "Settings.h"
@@ -25,7 +26,6 @@ LineNumBar
     
         public: WindowPanel mBar;
         public: InputLine mInputNumber;
-//        public: const Settings& mSettings;
 
         protected: MouseMap<tAction> mMouseToAction;
 
@@ -33,9 +33,7 @@ LineNumBar
     ////////// construction
 
             public:
-        LineNumBar( )  // const Settings& settings )
-//             :
-//             mSettings ( settings )
+        LineNumBar( )
             {
             }
 
@@ -53,7 +51,7 @@ LineNumBar
     ////////// methods
 
             public: void
-        CreatePanel( )
+        CreatePanel( bool resizeOnly=false )
             {
             // find screen size
             int y_size, x_size;
@@ -85,9 +83,14 @@ LineNumBar
             Print( goto_label, field_start );
             // goto input
             mMouseToAction.Add(  EDIT_GOTO,  field_start,  Point( field_start.Y + 1,  field_start.X + input_size ) );
-            mInputNumber.CreatePanel( input_size, 
-                                      bar_start.Y + field_start.Y,  bar_start.X + field_start.X, 
-                                      A_UNDERLINE, "" );
+            if ( resizeOnly ){
+                mInputNumber.ResizeWindow( input_size,  bar_start.Y + field_start.Y,  bar_start.X + field_start.X );
+                }
+            else {
+                mInputNumber.CreatePanel( input_size, 
+                                          bar_start.Y + field_start.Y,  bar_start.X + field_start.X, 
+                                          A_UNDERLINE, "" );
+                }
             field_start.X += input_size;
             // cancel label
             Print( "    ", field_start );
@@ -113,7 +116,7 @@ LineNumBar
 
 
             public: int // returns line number, or UNKNOWN if cancelled
-        Run( int current_line )
+        Run( int current_line, KeyListener& resizeListener )
             {
             mInputNumber.MoveLineEnd();
 
@@ -144,6 +147,8 @@ LineNumBar
                     HandleMouseEvent( mouse_event, number_set, line_number );
                     if ( number_set ) return line_number;
                     }
+                else if ( i == KEY_RESIZE ) {  int result = Cancel();  resizeListener.onKey(i);  return result;  }
+                else if ( i == -1 ) {  }   // Ignore noise from window switching
                 else if ( Settings::Get().KeyHasFunction( i, Settings::MENU ) )
                     {
                     return Cancel();

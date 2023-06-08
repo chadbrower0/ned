@@ -317,6 +317,15 @@ InputArea
             }
 
             public: void
+        ResizeWindow( ){  PSEUDOSTACK_START
+            Point viewportStartPoint = mView.GetWindowStart();
+            long viewportStartIndex = mView.GetWindowStartCharIndex();
+            CreatePanel();  // Recreates mView, moves viewport to (0,0)
+            mView.MoveWindow( viewportStartPoint, viewportStartIndex );
+            updateScreen();
+            PSEUDOSTACK_END  }
+
+            public: void
         CreatePanel( )
             {  PSEUDOSTACK_START
             Point screen_size = GetWindowSize( stdscr );
@@ -327,7 +336,12 @@ InputArea
             PSEUDOSTACK_END
             }
 
-
+            private: void
+        updateScreen( ){  PSEUDOSTACK_START
+            UpdateCursorToScreen();
+            update_panels();
+            doupdate();
+            PSEUDOSTACK_END  }
 
 
     ////////// methods -- data access

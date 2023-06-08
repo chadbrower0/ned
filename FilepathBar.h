@@ -1,6 +1,7 @@
 #ifndef INCLUDED_FilepathBar_h
 #define INCLUDED_FilepathBar_h
 ////////////////////////////////////////////////////////////////////////////////
+#include "KeyListener.h"
 #include "WindowPanel.h"
 #include "InputLine.h"
 #include "Settings.h"
@@ -22,7 +23,6 @@ FilepathBar
     ////////// member data 
         public: WindowPanel mBar;
         public: InputLine mInputFilepath;
-//         public: const Settings& mSettings;
 
         protected: MouseMap<tAction> mMouseToAction;
 
@@ -30,9 +30,7 @@ FilepathBar
     ////////// construction
 
             public:
-        FilepathBar( )  // const Settings& settings )
-//             :
-//             mSettings ( settings )
+        FilepathBar( )
             {
             }
 
@@ -96,7 +94,7 @@ FilepathBar
 
 
             public: std::string // returns "" if cancelled
-        Run( const std::string& old_filepath = "" )
+        Run( KeyListener& resizeListener, const std::string& old_filepath = "" )
             {
             mInputFilepath.SetText( old_filepath );
             mInputFilepath.MoveLineEnd();
@@ -124,7 +122,8 @@ FilepathBar
                     HandleMouseEvent( mouse_event, filepath_set, filepath );
                     if ( filepath_set ) return filepath;
                     }
-else if ( i == -1 ) {  }  // ignore noise from window switching
+                else if ( i == KEY_RESIZE ) {  std::string result = Cancel();  resizeListener.onKey(i);  return result;  }
+                else if ( i == -1 ) {  }  // ignore noise from window switching
                 // keyboard shortcut
                 else if ( Settings::Get().KeyHasFunction( i, Settings::BACKWARD ) )   mInputFilepath.MoveLeft();
                 else if ( Settings::Get().KeyHasFunction( i, Settings::FORWARD ) )    mInputFilepath.MoveRight();

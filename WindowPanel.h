@@ -66,6 +66,7 @@ WindowPanel
 			public: void
 		Create( int y_size, int x_size, int y, int x ) 
 			{
+                        mPanel.Clear();
 			mWindow = newwin( y_size, x_size, y, x );
 			mPanel = new_panel( mWindow.Get() );
 			}

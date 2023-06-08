@@ -21,7 +21,6 @@ YesNoBar
     ////////// member data 
         public: WindowPanel mBar;
         public: bool mAllowCancel;
-//         public: const Settings& mSettings;
 
         protected: MouseMap<Answer> mMouseToAction;
 
@@ -30,9 +29,7 @@ YesNoBar
     ////////// construction
 
             protected:
-        YesNoBar( ) // const Settings& settings )
-//             :
-//             mSettings ( settings ) 
+        YesNoBar( )
             {
             mAllowCancel = false;
             }
@@ -43,10 +40,9 @@ YesNoBar
             }
 
             public: static Answer
-        Ask( // const Settings& settings, 
-             const std::string& question, bool allow_cancel )
+        Ask( const std::string& question, bool allow_cancel )
             {
-            YesNoBar bar;  //  ( settings );
+            YesNoBar bar;
             bar.mAllowCancel = allow_cancel;
             bar.CreatePanel( question );
             update_panels();
@@ -134,6 +130,8 @@ YesNoBar
                     HandleMouseEvent( mouse_event, handled, answer );
                     if ( handled ) return answer;
                     }
+                else if ( i == KEY_RESIZE ) {  return Cancel;  }
+                else if ( i == -1 ) {  }  // Ignore noisy events from switching windows
                 else if ( Settings::Get().KeyHasFunction( i, Settings::MENU )  &&  mAllowCancel ) 
                     {
                     return Cancel;
@@ -158,8 +156,6 @@ YesNoBar
             // or store map of position to function?
             //     + works even if there's a text input field that happens to match the button/label/name
 
-// std::cerr << "\n\n" << "HandleMouseEvent()";
-
             handled = false;
 
             // get mouse event
@@ -169,8 +165,6 @@ YesNoBar
                 Point window_start;
                 getbegyx( mBar.Window(), window_start.Y, window_start.X );
                 Point mouse_relative_window = Point (  mouse_event.y - window_start.Y ,  mouse_event.x - window_start.X );
-
-// std::cerr << "\n\t" << "mouse_relative_window = " << mouse_relative_window.ToString();
 
                 if ( mouse_event.bstate & BUTTON1_CLICKED )
                     {

@@ -109,6 +109,15 @@ mView.mNewlineDisplayText = "\\n";
         ~InputLine( ) {  }
 
             public: void
+        ResizeWindow( int x_size, int y, int x ){
+            mView.CreatePanel( 1, x_size, y, x );
+            mView.mBackgroundChar = ( ' ' | mAttributes );
+
+            FormatLine();
+            wmove( mView.Window(), 0, mCursor.mDisplayX - mView.GetWindowStart().X );
+        }
+
+            public: void
         CreatePanel( int x_size, int y, int x, int attributes, const std::string& start_text )
             {
             mView.CreatePanel( 1, x_size, y, x );
